@@ -1,0 +1,71 @@
+# This file is part of libertine linux's package vim. It is subject to the license terms in the COPYRIGHT file found in the top-level directory of this distribution and at https://raw.githubusercontent.com/libertine-linux-packages/vim/master/COPYRIGHT. No part of libertine linux's package vim, including this file, may be copied, modified, propagated, or distributed except according to the terms contained in the COPYRIGHT file.
+# Copyright © 2018 The developers of libertine linux's package vim. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/libertine-linux-packages/vim/master/COPYRIGHT.
+
+
+variant=upstream
+
+depends build_ccache
+build_needs ccache
+
+depends build_gnumake
+build_needs make
+
+depends build_busybox
+build_needs sh env cp mkdir
+
+depends build_paxctl
+build_needs paxctl
+
+case "$package" in
+	
+	build_xxd)
+	
+		build_provides xxd
+
+		depends build_musl_cross_make_build
+		build_needs "$libertine_build"-cc "$libertine_build"-gcc "$libertine_build"-ar "$libertine_build"-ld "$libertine_build"-ranlib
+
+		libertine_compile_build_xxd()
+		{
+			_libertine_compile_xxd_internal "$(libertine_public_outputBuildSysrootPath)" false
+		}
+	
+	;;
+	
+	xxd)
+
+		depends build_musl_cross_make_host
+		build_needs "$libertine_host"-cc "$libertine_host"-gcc "$libertine_host"-ar "$libertine_host"-ld "$libertine_host"-ranlib "$libertine_host"-strip
+		
+		depends build_paxctl
+		build_needs paxctl
+				
+		libertine_compile_nasm()
+		{
+			_libertine_compile_xxd_internal "$(libertine_public_outputHostSysrootPath)" true
+		}
+	;;
+	
+esac
+
+build_needs mkdir cp
+_libertine_compile_xxd_internal()
+{
+	local destinationSysrootPath="$1"
+	local isForInitramfsSysroot="$2"
+	
+	local outputBinFolderPath="$destinationSysrootPath"/usr/bin
+	mkdir -m 0755 -p "$outputBinFolderPath"
+	
+	pushd "$(libertine_public_sourcePath)"/src/xxd
+		
+		libertine_public_make CC="$libertine_build"-cc CFLAGS="$(libertine_public_buildCCompilerFlags)"
+		
+	popd
+	
+	cp "$(libertine_public_sourcePath)"/src/xxd/xxd "$outputBinFolderPath"
+	
+	if $isForInitramfsSysroot; then
+		libertine_public_stripAndSecureBinary "$outputBinFolderPath"/xxd
+	fi
+}
