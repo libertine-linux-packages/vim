@@ -1,4 +1,4 @@
-# nasm for Libertine Linux
+# vim for Libertine Linux
 
 ## License
 
