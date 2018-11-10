@@ -1,0 +1,36 @@
+# This file is part of libertine linux's package vim. It is subject to the license terms in the COPYRIGHT file found in the top-level directory of this distribution and at https://raw.githubusercontent.com/libertine-linux-packages/vim/master/COPYRIGHT. No part of libertine linux's package vim, including this file, may be copied, modified, propagated, or distributed except according to the terms contained in the COPYRIGHT file.
+# Copyright © 2016 The developers of libertine linux's package vim. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/libertine-linux-packages/vim/master/COPYRIGHT.
+
+
+variant=upstream
+
+build_provides xxd
+
+depends build_ccache
+build_needs ccache
+
+depends build_gnumake
+build_needs make
+
+depends build_busybox
+build_needs sh env cp mkdir
+
+depends build_paxctl
+build_needs paxctl
+
+depends build_musl_cross_make_build
+build_needs "$libertine_build"-cc "$libertine_build"-gcc "$libertine_build"-ar "$libertine_build"-ld "$libertine_build"-ranlib
+
+libertine_compile_build_xxd()
+{
+	local outputBinFolderPath="$outputFolderPath"/usr/bin
+	mkdir -m 0755 -p "$outputBinFolderPath"
+	
+	pushd "$(libertine_public_sourcePath)"/src/xxd
+	
+		libertine_public_make
+		
+	popd
+	
+	cp "$(libertine_public_sourcePath)"/src/xxd/xxd "$outputBinFolderPath"
+}
