@@ -27,7 +27,7 @@ case "$package" in
 
 		libertine_compile_build_xxd()
 		{
-			_libertine_compile_xxd_internal "$(libertine_public_outputBuildSysrootPath)" false
+			_libertine_compile_xxd_internal "$(libertine_public_outputBuildSysrootPath)" false "$libertine_build"-cc "$(libertine_public_buildCCompilerFlags)"
 		}
 	
 	;;
@@ -42,7 +42,7 @@ case "$package" in
 				
 		libertine_compile_nasm()
 		{
-			_libertine_compile_xxd_internal "$(libertine_public_outputHostSysrootPath)" true
+			_libertine_compile_xxd_internal "$(libertine_public_outputHostSysrootPath)" true "$libertine_host"-cc "$(libertine_public_hostCCompilerFlags)"
 		}
 	;;
 	
@@ -53,13 +53,15 @@ _libertine_compile_xxd_internal()
 {
 	local destinationSysrootPath="$1"
 	local isForInitramfsSysroot="$2"
+	local cCompiler="$3"
+	local cFlags="$4"
 	
 	local outputBinFolderPath="$destinationSysrootPath"/usr/bin
 	mkdir -m 0755 -p "$outputBinFolderPath"
 	
 	pushd "$(libertine_public_sourcePath)"/src/xxd
-		
-		libertine_public_make CC="$libertine_build"-cc CFLAGS="$(libertine_public_buildCCompilerFlags)"
+	
+		libertine_public_make CC="$cCompiler" CFLAGS="$cFlags"
 		
 	popd
 	
