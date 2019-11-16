@@ -1,3 +1,5 @@
 [submodule "upstream"]
 	path = upstream
-	url = https://github.com/vim/vim
+	url = https://github.com/libertine-linux-clones/vim.git
+	branch = master
+	libertine-linux-upstream = https://github.com/vim/vim
